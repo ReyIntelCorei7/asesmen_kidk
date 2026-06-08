@@ -44,6 +44,6 @@ class ObatBloc {
     String apiUrl = ApiUrl.deleteObat(id!);
     var response = await Api().delete(apiUrl);
     var jsonObj = json.decode(response.body);
-    return (jsonObj as Map<String, dynamic>)['data'];
+    return (jsonObj as Map<String, dynamic>)['status'];
   }
 }

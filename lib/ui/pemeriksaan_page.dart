@@ -108,8 +108,8 @@ class ItemPemeriksaan extends StatelessWidget {
       },
       child: Card(
         child: ListTile(
-          title: Text('Tanggal: ${pemeriksaan.tanggalPeriksa ?? ''}'),
-          subtitle: Text('Diagnosis: ${pemeriksaan.diagnosis ?? ''}'),
+          title: Text('Pasien: ${pemeriksaan.namaPasien ?? ''}'),
+          subtitle: Text('Dokter: ${pemeriksaan.namaDokter ?? ''} | Tanggal: ${pemeriksaan.tanggalPeriksa ?? ''}'),
         ),
       ),
     );

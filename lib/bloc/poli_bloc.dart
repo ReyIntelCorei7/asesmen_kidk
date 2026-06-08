@@ -42,6 +42,6 @@ class PoliBloc {
     String apiUrl = ApiUrl.deletePoli(id!);
     var response = await Api().delete(apiUrl);
     var jsonObj = json.decode(response.body);
-    return (jsonObj as Map<String, dynamic>)['data'];
+    return (jsonObj as Map<String, dynamic>)['status'];
   }
 }

@@ -108,7 +108,7 @@ class ItemPembayaran extends StatelessWidget {
       },
       child: Card(
         child: ListTile(
-          title: Text('Tanggal: ${pembayaran.tanggalBayar ?? ''}'),
+          title: Text('Pasien: ${pembayaran.namaPasien ?? ''}'),
           subtitle: Text('Status: ${pembayaran.statusPembayaran ?? ''} | Tagihan: ${pembayaran.totalTagihan ?? 0}'),
         ),
       ),

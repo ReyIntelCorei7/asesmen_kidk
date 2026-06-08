@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:asesmen_kidk_rumah_sakit/bloc/pemeriksaan_bloc.dart';
+import 'package:asesmen_kidk_rumah_sakit/bloc/pasien_bloc.dart';
+import 'package:asesmen_kidk_rumah_sakit/bloc/dokter_bloc.dart';
 import 'package:asesmen_kidk_rumah_sakit/model/pemeriksaan.dart';
+import 'package:asesmen_kidk_rumah_sakit/model/pasien.dart';
+import 'package:asesmen_kidk_rumah_sakit/model/dokter.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/pemeriksaan_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PemeriksaanForm extends StatefulWidget {
-  final Pemeriksaan? pemeriksaan;
-  const PemeriksaanForm({super.key, this.pemeriksaan});
+  Pemeriksaan? pemeriksaan;
+  PemeriksaanForm({Key? key, this.pemeriksaan}) : super(key: key);
 
   @override
   _PemeriksaanFormState createState() => _PemeriksaanFormState();
@@ -18,8 +22,12 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
   String judul = "TAMBAH PEMERIKSAAN";
   String tombolSubmit = "SIMPAN";
 
-  final _noRekamMedisTextboxController = TextEditingController();
-  final _idDokterTextboxController = TextEditingController();
+  List<Pasien> _listPasien = [];
+  List<Dokter> _listDokter = [];
+  
+  int? _selectedPasienId;
+  int? _selectedDokterId;
+
   final _tanggalPeriksaTextboxController = TextEditingController();
   final _diagnosisTextboxController = TextEditingController();
   final _tindakanTextboxController = TextEditingController();
@@ -29,15 +37,33 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
   void initState() {
     super.initState();
     isUpdate();
+    _loadData();
   }
 
-  void isUpdate() {
+  void _loadData() async {
+    try {
+      List pasienList = await PasienBloc.getPasiens();
+      List dokterList = await DokterBloc.getDokters();
+      setState(() {
+        _listPasien = pasienList.cast<Pasien>();
+        _listDokter = dokterList.cast<Dokter>();
+        if (widget.pemeriksaan != null) {
+          _selectedPasienId = widget.pemeriksaan!.noRekamMedis;
+          _selectedDokterId = widget.pemeriksaan!.idDokter;
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  isUpdate() {
     if (widget.pemeriksaan != null) {
       setState(() {
         judul = "UBAH PEMERIKSAAN";
         tombolSubmit = "UBAH";
-        _noRekamMedisTextboxController.text = widget.pemeriksaan!.noRekamMedis.toString();
-        _idDokterTextboxController.text = widget.pemeriksaan!.idDokter.toString();
+        _selectedPasienId = widget.pemeriksaan!.noRekamMedis;
+        _selectedDokterId = widget.pemeriksaan!.idDokter;
         _tanggalPeriksaTextboxController.text = widget.pemeriksaan!.tanggalPeriksa ?? '';
         _diagnosisTextboxController.text = widget.pemeriksaan!.diagnosis ?? '';
         _tindakanTextboxController.text = widget.pemeriksaan!.tindakan ?? '';
@@ -57,12 +83,13 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
             key: _formKey,
             child: Column(
               children: [
-                _noRekamMedisTextField(),
-                _idDokterTextField(),
+                _pasienDropdownField(),
+                _dokterDropdownField(),
                 _tanggalPeriksaTextField(),
                 _diagnosisTextField(),
                 _tindakanTextField(),
                 _biayaPemeriksaanTextField(),
+                const SizedBox(height: 20),
                 _buttonSubmit(),
               ],
             ),
@@ -72,27 +99,37 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
     );
   }
 
-  Widget _noRekamMedisTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: "No Rekam Medis"),
-      keyboardType: TextInputType.number,
-      controller: _noRekamMedisTextboxController,
-      validator: (value) {
-        if (value!.isEmpty) return "No Rekam Medis harus diisi";
-        return null;
+  Widget _pasienDropdownField() {
+    return DropdownButtonFormField<int>(
+      decoration: const InputDecoration(labelText: "Pasien"),
+      value: _selectedPasienId,
+      items: _listPasien.map((Pasien p) {
+        return DropdownMenuItem<int>(
+          value: p.noRekamMedis,
+          child: Text(p.namaPasien ?? ''),
+        );
+      }).toList(),
+      onChanged: (int? newValue) {
+        setState(() => _selectedPasienId = newValue);
       },
+      validator: (value) => value == null ? "Pilih Pasien" : null,
     );
   }
 
-  Widget _idDokterTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: "ID Dokter"),
-      keyboardType: TextInputType.number,
-      controller: _idDokterTextboxController,
-      validator: (value) {
-        if (value!.isEmpty) return "ID Dokter harus diisi";
-        return null;
+  Widget _dokterDropdownField() {
+    return DropdownButtonFormField<int>(
+      decoration: const InputDecoration(labelText: "Dokter"),
+      value: _selectedDokterId,
+      items: _listDokter.map((Dokter d) {
+        return DropdownMenuItem<int>(
+          value: d.idDokter,
+          child: Text(d.namaDokter ?? ''),
+        );
+      }).toList(),
+      onChanged: (int? newValue) {
+        setState(() => _selectedDokterId = newValue);
       },
+      validator: (value) => value == null ? "Pilih Dokter" : null,
     );
   }
 
@@ -101,18 +138,13 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
       decoration: const InputDecoration(labelText: "Tanggal Periksa (YYYY-MM-DD)"),
       keyboardType: TextInputType.datetime,
       controller: _tanggalPeriksaTextboxController,
-      validator: (value) {
-        if (value!.isEmpty) return "Tanggal harus diisi";
-        return null;
-      },
     );
   }
 
   Widget _diagnosisTextField() {
     return TextFormField(
       decoration: const InputDecoration(labelText: "Diagnosis"),
-      keyboardType: TextInputType.multiline,
-      maxLines: 3,
+      keyboardType: TextInputType.text,
       controller: _diagnosisTextboxController,
     );
   }
@@ -120,8 +152,7 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
   Widget _tindakanTextField() {
     return TextFormField(
       decoration: const InputDecoration(labelText: "Tindakan"),
-      keyboardType: TextInputType.multiline,
-      maxLines: 3,
+      keyboardType: TextInputType.text,
       controller: _tindakanTextboxController,
     );
   }
@@ -141,66 +172,43 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
         var validate = _formKey.currentState!.validate();
         if (validate) {
           if (!_isLoading) {
-            if (widget.pemeriksaan != null) {
-              ubah();
-            } else {
-              simpan();
-            }
+            widget.pemeriksaan != null ? ubah() : simpan();
           }
         }
       },
     );
   }
 
-  void simpan() {
+  simpan() {
     setState(() => _isLoading = true);
-    Pemeriksaan createPemeriksaan = Pemeriksaan(idPemeriksaan: null);
-    createPemeriksaan.noRekamMedis = int.parse(_noRekamMedisTextboxController.text);
-    createPemeriksaan.idDokter = int.parse(_idDokterTextboxController.text);
-    createPemeriksaan.tanggalPeriksa = _tanggalPeriksaTextboxController.text;
-    createPemeriksaan.diagnosis = _diagnosisTextboxController.text;
-    createPemeriksaan.tindakan = _tindakanTextboxController.text;
-    createPemeriksaan.biayaPemeriksaan = double.tryParse(_biayaPemeriksaanTextboxController.text) ?? 0;
-    PemeriksaanBloc.addPemeriksaan(pemeriksaan: createPemeriksaan).then((value) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const PemeriksaanPage()),
-      );
+    Pemeriksaan create = Pemeriksaan(idPemeriksaan: null);
+    create.noRekamMedis = _selectedPasienId;
+    create.idDokter = _selectedDokterId;
+    create.tanggalPeriksa = _tanggalPeriksaTextboxController.text;
+    create.diagnosis = _diagnosisTextboxController.text;
+    create.tindakan = _tindakanTextboxController.text;
+    create.biayaPemeriksaan = double.tryParse(_biayaPemeriksaanTextboxController.text) ?? 0;
+    PemeriksaanBloc.addPemeriksaan(pemeriksaan: create).then((value) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const PemeriksaanPage()));
     }, onError: (error) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => const WarningDialog(
-          description: "Simpan gagal, silahkan coba lagi",
-        ),
-      );
+      showDialog(context: context, builder: (context) => const WarningDialog(description: "Simpan gagal"));
     });
     setState(() => _isLoading = false);
   }
 
-  void ubah() {
+  ubah() {
     setState(() => _isLoading = true);
-    Pemeriksaan updatePemeriksaan = Pemeriksaan(idPemeriksaan: null);
-    updatePemeriksaan.idPemeriksaan = widget.pemeriksaan!.idPemeriksaan;
-    updatePemeriksaan.noRekamMedis = int.parse(_noRekamMedisTextboxController.text);
-    updatePemeriksaan.idDokter = int.parse(_idDokterTextboxController.text);
-    updatePemeriksaan.tanggalPeriksa = _tanggalPeriksaTextboxController.text;
-    updatePemeriksaan.diagnosis = _diagnosisTextboxController.text;
-    updatePemeriksaan.tindakan = _tindakanTextboxController.text;
-    updatePemeriksaan.biayaPemeriksaan = double.tryParse(_biayaPemeriksaanTextboxController.text) ?? 0;
-    PemeriksaanBloc.updatePemeriksaan(pemeriksaan: updatePemeriksaan).then((value) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const PemeriksaanPage()),
-      );
+    Pemeriksaan update = Pemeriksaan(idPemeriksaan: widget.pemeriksaan!.idPemeriksaan);
+    update.noRekamMedis = _selectedPasienId;
+    update.idDokter = _selectedDokterId;
+    update.tanggalPeriksa = _tanggalPeriksaTextboxController.text;
+    update.diagnosis = _diagnosisTextboxController.text;
+    update.tindakan = _tindakanTextboxController.text;
+    update.biayaPemeriksaan = double.tryParse(_biayaPemeriksaanTextboxController.text) ?? 0;
+    PemeriksaanBloc.updatePemeriksaan(pemeriksaan: update).then((value) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const PemeriksaanPage()));
     }, onError: (error) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => const WarningDialog(
-          description: "Ubah gagal, silahkan coba lagi",
-        ),
-      );
+      showDialog(context: context, builder: (context) => const WarningDialog(description: "Ubah gagal"));
     });
     setState(() => _isLoading = false);
   }

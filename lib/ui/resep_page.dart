@@ -108,8 +108,8 @@ class ItemResep extends StatelessWidget {
       },
       child: Card(
         child: ListTile(
-          title: Text('Tanggal: ${resep.tanggalResep ?? ''}'),
-          subtitle: Text('Total Biaya: ${resep.totalBiayaObat ?? 0}'),
+          title: Text('Pasien: ${resep.namaPasien ?? ''}'),
+          subtitle: Text('Tgl: ${resep.tanggalResep ?? ''} | Dokter: ${resep.namaDokter ?? ''}'),
         ),
       ),
     );

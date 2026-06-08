@@ -4,6 +4,8 @@ class Pembayaran {
   double? totalTagihan;
   String? tanggalBayar;
   String? statusPembayaran;
+  String? diagnosis;
+  String? namaPasien;
 
   Pembayaran({
     this.idPembayaran,
@@ -11,6 +13,8 @@ class Pembayaran {
     this.totalTagihan,
     this.tanggalBayar,
     this.statusPembayaran,
+    this.diagnosis,
+    this.namaPasien,
   });
 
   factory Pembayaran.fromJson(Map<String, dynamic> obj) {
@@ -20,6 +24,8 @@ class Pembayaran {
       totalTagihan: double.tryParse(obj['total_tagihan'].toString()),
       tanggalBayar: obj['tanggal_bayar'],
       statusPembayaran: obj['status_pembayaran'],
+      diagnosis: obj['diagnosis'],
+      namaPasien: obj['nama_pasien'],
     );
   }
 }

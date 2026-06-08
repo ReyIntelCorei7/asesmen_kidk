@@ -109,7 +109,7 @@ class ItemDokter extends StatelessWidget {
       child: Card(
         child: ListTile(
           title: Text(dokter.namaDokter ?? ''),
-          subtitle: Text('Spesialisasi: ${dokter.spesialisasi ?? ''}'),
+          subtitle: Text('Spesialisasi: ${dokter.spesialisasi ?? ''} | Poli: ${dokter.namaPoli ?? ''}'),
         ),
       ),
     );

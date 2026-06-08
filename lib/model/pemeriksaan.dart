@@ -6,6 +6,8 @@ class Pemeriksaan {
   String? diagnosis;
   String? tindakan;
   double? biayaPemeriksaan;
+  String? namaPasien;
+  String? namaDokter;
 
   Pemeriksaan({
     this.idPemeriksaan,
@@ -15,6 +17,8 @@ class Pemeriksaan {
     this.diagnosis,
     this.tindakan,
     this.biayaPemeriksaan,
+    this.namaPasien,
+    this.namaDokter,
   });
 
   factory Pemeriksaan.fromJson(Map<String, dynamic> obj) {
@@ -26,6 +30,8 @@ class Pemeriksaan {
       diagnosis: obj['diagnosis'],
       tindakan: obj['tindakan'],
       biayaPemeriksaan: double.tryParse(obj['biaya_pemeriksaan'].toString()),
+      namaPasien: obj['nama_pasien'],
+      namaDokter: obj['nama_dokter'],
     );
   }
 }

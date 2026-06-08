@@ -50,6 +50,6 @@ class PemeriksaanBloc {
     String apiUrl = ApiUrl.deletePemeriksaan(id!);
     var response = await Api().delete(apiUrl);
     var jsonObj = json.decode(response.body);
-    return (jsonObj as Map<String, dynamic>)['data'];
+    return (jsonObj as Map<String, dynamic>)['status'];
   }
 }

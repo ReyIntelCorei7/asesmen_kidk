@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:asesmen_kidk_rumah_sakit/bloc/resep_bloc.dart';
+import 'package:asesmen_kidk_rumah_sakit/bloc/pemeriksaan_bloc.dart';
 import 'package:asesmen_kidk_rumah_sakit/model/resep.dart';
+import 'package:asesmen_kidk_rumah_sakit/model/pemeriksaan.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/resep_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class ResepForm extends StatefulWidget {
-  final Resep? resep;
-  const ResepForm({super.key, this.resep});
+  Resep? resep;
+  ResepForm({Key? key, this.resep}) : super(key: key);
 
   @override
   _ResepFormState createState() => _ResepFormState();
@@ -18,9 +20,10 @@ class _ResepFormState extends State<ResepForm> {
   String judul = "TAMBAH RESEP";
   String tombolSubmit = "SIMPAN";
 
-  final _idPemeriksaanTextboxController = TextEditingController();
-  final _noRekamMedisTextboxController = TextEditingController();
-  final _idDokterTextboxController = TextEditingController();
+  List<Pemeriksaan> _listPemeriksaan = [];
+  int? _selectedPemeriksaanId;
+  Pemeriksaan? _selectedPemeriksaanObj;
+
   final _tanggalResepTextboxController = TextEditingController();
   final _totalBiayaObatTextboxController = TextEditingController();
 
@@ -28,16 +31,27 @@ class _ResepFormState extends State<ResepForm> {
   void initState() {
     super.initState();
     isUpdate();
+    _loadPemeriksaan();
   }
 
-  void isUpdate() {
+  void _loadPemeriksaan() async {
+    try {
+      List pemeriksList = await PemeriksaanBloc.getPemeriksaans();
+      setState(() {
+        _listPemeriksaan = pemeriksList.cast<Pemeriksaan>();
+        if (widget.resep != null) {
+          _selectedPemeriksaanId = widget.resep!.idPemeriksaan;
+          _selectedPemeriksaanObj = _listPemeriksaan.firstWhere((p) => p.idPemeriksaan == widget.resep!.idPemeriksaan);
+        }
+      });
+    } catch (e) {}
+  }
+
+  isUpdate() {
     if (widget.resep != null) {
       setState(() {
         judul = "UBAH RESEP";
         tombolSubmit = "UBAH";
-        _idPemeriksaanTextboxController.text = widget.resep!.idPemeriksaan.toString();
-        _noRekamMedisTextboxController.text = widget.resep!.noRekamMedis.toString();
-        _idDokterTextboxController.text = widget.resep!.idDokter.toString();
         _tanggalResepTextboxController.text = widget.resep!.tanggalResep ?? '';
         _totalBiayaObatTextboxController.text = widget.resep!.totalBiayaObat.toString();
       });
@@ -55,11 +69,16 @@ class _ResepFormState extends State<ResepForm> {
             key: _formKey,
             child: Column(
               children: [
-                _idPemeriksaanTextField(),
-                _noRekamMedisTextField(),
-                _idDokterTextField(),
+                _pemeriksaanDropdownField(),
+                if (_selectedPemeriksaanObj != null) ...[
+                  ListTile(
+                    title: Text("Pasien: ${_selectedPemeriksaanObj!.namaPasien}"),
+                    subtitle: Text("Dokter: ${_selectedPemeriksaanObj!.namaDokter}"),
+                  )
+                ],
                 _tanggalResepTextField(),
                 _totalBiayaObatTextField(),
+                const SizedBox(height: 20),
                 _buttonSubmit(),
               ],
             ),
@@ -69,39 +88,23 @@ class _ResepFormState extends State<ResepForm> {
     );
   }
 
-  Widget _idPemeriksaanTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: "ID Pemeriksaan"),
-      keyboardType: TextInputType.number,
-      controller: _idPemeriksaanTextboxController,
-      validator: (value) {
-        if (value!.isEmpty) return "ID Pemeriksaan harus diisi";
-        return null;
+  Widget _pemeriksaanDropdownField() {
+    return DropdownButtonFormField<int>(
+      decoration: const InputDecoration(labelText: "Pemeriksaan"),
+      value: _selectedPemeriksaanId,
+      items: _listPemeriksaan.map((Pemeriksaan p) {
+        return DropdownMenuItem<int>(
+          value: p.idPemeriksaan,
+          child: Text("${p.tanggalPeriksa} - ${p.namaPasien}"),
+        );
+      }).toList(),
+      onChanged: (int? newValue) {
+        setState(() {
+          _selectedPemeriksaanId = newValue;
+          _selectedPemeriksaanObj = _listPemeriksaan.firstWhere((p) => p.idPemeriksaan == newValue);
+        });
       },
-    );
-  }
-
-  Widget _noRekamMedisTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: "No Rekam Medis"),
-      keyboardType: TextInputType.number,
-      controller: _noRekamMedisTextboxController,
-      validator: (value) {
-        if (value!.isEmpty) return "No Rekam Medis harus diisi";
-        return null;
-      },
-    );
-  }
-
-  Widget _idDokterTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: "ID Dokter"),
-      keyboardType: TextInputType.number,
-      controller: _idDokterTextboxController,
-      validator: (value) {
-        if (value!.isEmpty) return "ID Dokter harus diisi";
-        return null;
-      },
+      validator: (value) => value == null ? "Pilih Pemeriksaan" : null,
     );
   }
 
@@ -110,10 +113,7 @@ class _ResepFormState extends State<ResepForm> {
       decoration: const InputDecoration(labelText: "Tanggal Resep (YYYY-MM-DD)"),
       keyboardType: TextInputType.datetime,
       controller: _tanggalResepTextboxController,
-      validator: (value) {
-        if (value!.isEmpty) return "Tanggal harus diisi";
-        return null;
-      },
+      validator: (value) => value!.isEmpty ? "Tanggal harus diisi" : null,
     );
   }
 
@@ -132,64 +132,41 @@ class _ResepFormState extends State<ResepForm> {
         var validate = _formKey.currentState!.validate();
         if (validate) {
           if (!_isLoading) {
-            if (widget.resep != null) {
-              ubah();
-            } else {
-              simpan();
-            }
+            widget.resep != null ? ubah() : simpan();
           }
         }
       },
     );
   }
 
-  void simpan() {
+  simpan() {
     setState(() => _isLoading = true);
-    Resep createResep = Resep(idResep: null);
-    createResep.idPemeriksaan = int.parse(_idPemeriksaanTextboxController.text);
-    createResep.noRekamMedis = int.parse(_noRekamMedisTextboxController.text);
-    createResep.idDokter = int.parse(_idDokterTextboxController.text);
-    createResep.tanggalResep = _tanggalResepTextboxController.text;
-    createResep.totalBiayaObat = double.tryParse(_totalBiayaObatTextboxController.text) ?? 0;
-    ResepBloc.addResep(resep: createResep).then((value) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ResepPage()),
-      );
+    Resep create = Resep(idResep: null);
+    create.idPemeriksaan = _selectedPemeriksaanId;
+    create.noRekamMedis = _selectedPemeriksaanObj?.noRekamMedis;
+    create.idDokter = _selectedPemeriksaanObj?.idDokter;
+    create.tanggalResep = _tanggalResepTextboxController.text;
+    create.totalBiayaObat = double.tryParse(_totalBiayaObatTextboxController.text) ?? 0;
+    ResepBloc.addResep(resep: create).then((value) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ResepPage()));
     }, onError: (error) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => const WarningDialog(
-          description: "Simpan gagal, silahkan coba lagi",
-        ),
-      );
+      showDialog(context: context, builder: (context) => const WarningDialog(description: "Simpan gagal"));
     });
     setState(() => _isLoading = false);
   }
 
-  void ubah() {
+  ubah() {
     setState(() => _isLoading = true);
-    Resep updateResep = Resep(idResep: null);
-    updateResep.idResep = widget.resep!.idResep;
-    updateResep.idPemeriksaan = int.parse(_idPemeriksaanTextboxController.text);
-    updateResep.noRekamMedis = int.parse(_noRekamMedisTextboxController.text);
-    updateResep.idDokter = int.parse(_idDokterTextboxController.text);
-    updateResep.tanggalResep = _tanggalResepTextboxController.text;
-    updateResep.totalBiayaObat = double.tryParse(_totalBiayaObatTextboxController.text) ?? 0;
-    ResepBloc.updateResep(resep: updateResep).then((value) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ResepPage()),
-      );
+    Resep update = Resep(idResep: widget.resep!.idResep);
+    update.idPemeriksaan = _selectedPemeriksaanId;
+    update.noRekamMedis = _selectedPemeriksaanObj?.noRekamMedis;
+    update.idDokter = _selectedPemeriksaanObj?.idDokter;
+    update.tanggalResep = _tanggalResepTextboxController.text;
+    update.totalBiayaObat = double.tryParse(_totalBiayaObatTextboxController.text) ?? 0;
+    ResepBloc.updateResep(resep: update).then((value) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ResepPage()));
     }, onError: (error) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => const WarningDialog(
-          description: "Ubah gagal, silahkan coba lagi",
-        ),
-      );
+      showDialog(context: context, builder: (context) => const WarningDialog(description: "Ubah gagal"));
     });
     setState(() => _isLoading = false);
   }

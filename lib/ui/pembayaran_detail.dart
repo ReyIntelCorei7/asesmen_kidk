@@ -24,7 +24,7 @@ class _PembayaranDetailState extends State<PembayaranDetail> {
             const SizedBox(height: 20),
             Text("ID Pembayaran: ${widget.pembayaran!.idPembayaran}", style: const TextStyle(fontSize: 20.0)),
             const SizedBox(height: 10),
-            Text("ID Pemeriksaan: ${widget.pembayaran!.idPemeriksaan}", style: const TextStyle(fontSize: 18.0)),
+            Text("Pasien: ${widget.pembayaran!.namaPasien ?? ''}", style: const TextStyle(fontSize: 18.0)),
             const SizedBox(height: 10),
             Text("Total Tagihan: ${widget.pembayaran!.totalTagihan}", style: const TextStyle(fontSize: 18.0)),
             const SizedBox(height: 10),

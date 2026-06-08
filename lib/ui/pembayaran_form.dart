@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:asesmen_kidk_rumah_sakit/bloc/pembayaran_bloc.dart';
+import 'package:asesmen_kidk_rumah_sakit/bloc/pemeriksaan_bloc.dart';
 import 'package:asesmen_kidk_rumah_sakit/model/pembayaran.dart';
+import 'package:asesmen_kidk_rumah_sakit/model/pemeriksaan.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/pembayaran_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PembayaranForm extends StatefulWidget {
-  final Pembayaran? pembayaran;
-  const PembayaranForm({super.key, this.pembayaran});
+  Pembayaran? pembayaran;
+  PembayaranForm({Key? key, this.pembayaran}) : super(key: key);
 
   @override
   _PembayaranFormState createState() => _PembayaranFormState();
@@ -18,7 +20,10 @@ class _PembayaranFormState extends State<PembayaranForm> {
   String judul = "TAMBAH PEMBAYARAN";
   String tombolSubmit = "SIMPAN";
 
-  final _idPemeriksaanTextboxController = TextEditingController();
+  List<Pemeriksaan> _listPemeriksaan = [];
+  int? _selectedPemeriksaanId;
+  Pemeriksaan? _selectedPemeriksaanObj;
+
   final _totalTagihanTextboxController = TextEditingController();
   final _tanggalBayarTextboxController = TextEditingController();
   final _statusPembayaranTextboxController = TextEditingController();
@@ -27,14 +32,27 @@ class _PembayaranFormState extends State<PembayaranForm> {
   void initState() {
     super.initState();
     isUpdate();
+    _loadPemeriksaan();
   }
 
-  void isUpdate() {
+  void _loadPemeriksaan() async {
+    try {
+      List pemeriksList = await PemeriksaanBloc.getPemeriksaans();
+      setState(() {
+        _listPemeriksaan = pemeriksList.cast<Pemeriksaan>();
+        if (widget.pembayaran != null) {
+          _selectedPemeriksaanId = widget.pembayaran!.idPemeriksaan;
+          _selectedPemeriksaanObj = _listPemeriksaan.firstWhere((p) => p.idPemeriksaan == widget.pembayaran!.idPemeriksaan);
+        }
+      });
+    } catch (e) {}
+  }
+
+  isUpdate() {
     if (widget.pembayaran != null) {
       setState(() {
         judul = "UBAH PEMBAYARAN";
         tombolSubmit = "UBAH";
-        _idPemeriksaanTextboxController.text = widget.pembayaran!.idPemeriksaan.toString();
         _totalTagihanTextboxController.text = widget.pembayaran!.totalTagihan.toString();
         _tanggalBayarTextboxController.text = widget.pembayaran!.tanggalBayar ?? '';
         _statusPembayaranTextboxController.text = widget.pembayaran!.statusPembayaran ?? '';
@@ -53,10 +71,17 @@ class _PembayaranFormState extends State<PembayaranForm> {
             key: _formKey,
             child: Column(
               children: [
-                _idPemeriksaanTextField(),
+                _pemeriksaanDropdownField(),
+                if (_selectedPemeriksaanObj != null) ...[
+                  ListTile(
+                    title: Text("Pasien: ${_selectedPemeriksaanObj!.namaPasien}"),
+                    subtitle: Text("Biaya Periksa: ${_selectedPemeriksaanObj!.biayaPemeriksaan}"),
+                  )
+                ],
                 _totalTagihanTextField(),
                 _tanggalBayarTextField(),
                 _statusPembayaranTextField(),
+                const SizedBox(height: 20),
                 _buttonSubmit(),
               ],
             ),
@@ -66,15 +91,23 @@ class _PembayaranFormState extends State<PembayaranForm> {
     );
   }
 
-  Widget _idPemeriksaanTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: "ID Pemeriksaan"),
-      keyboardType: TextInputType.number,
-      controller: _idPemeriksaanTextboxController,
-      validator: (value) {
-        if (value!.isEmpty) return "ID Pemeriksaan harus diisi";
-        return null;
+  Widget _pemeriksaanDropdownField() {
+    return DropdownButtonFormField<int>(
+      decoration: const InputDecoration(labelText: "Pemeriksaan"),
+      value: _selectedPemeriksaanId,
+      items: _listPemeriksaan.map((Pemeriksaan p) {
+        return DropdownMenuItem<int>(
+          value: p.idPemeriksaan,
+          child: Text("${p.tanggalPeriksa} - ${p.namaPasien}"),
+        );
+      }).toList(),
+      onChanged: (int? newValue) {
+        setState(() {
+          _selectedPemeriksaanId = newValue;
+          _selectedPemeriksaanObj = _listPemeriksaan.firstWhere((p) => p.idPemeriksaan == newValue);
+        });
       },
+      validator: (value) => value == null ? "Pilih Pemeriksaan" : null,
     );
   }
 
@@ -109,62 +142,39 @@ class _PembayaranFormState extends State<PembayaranForm> {
         var validate = _formKey.currentState!.validate();
         if (validate) {
           if (!_isLoading) {
-            if (widget.pembayaran != null) {
-              ubah();
-            } else {
-              simpan();
-            }
+            widget.pembayaran != null ? ubah() : simpan();
           }
         }
       },
     );
   }
 
-  void simpan() {
+  simpan() {
     setState(() => _isLoading = true);
-    Pembayaran createPembayaran = Pembayaran(idPembayaran: null);
-    createPembayaran.idPemeriksaan = int.parse(_idPemeriksaanTextboxController.text);
-    createPembayaran.totalTagihan = double.tryParse(_totalTagihanTextboxController.text) ?? 0;
-    createPembayaran.tanggalBayar = _tanggalBayarTextboxController.text;
-    createPembayaran.statusPembayaran = _statusPembayaranTextboxController.text;
-    PembayaranBloc.addPembayaran(pembayaran: createPembayaran).then((value) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const PembayaranPage()),
-      );
+    Pembayaran create = Pembayaran(idPembayaran: null);
+    create.idPemeriksaan = _selectedPemeriksaanId;
+    create.totalTagihan = double.tryParse(_totalTagihanTextboxController.text) ?? 0;
+    create.tanggalBayar = _tanggalBayarTextboxController.text;
+    create.statusPembayaran = _statusPembayaranTextboxController.text;
+    PembayaranBloc.addPembayaran(pembayaran: create).then((value) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const PembayaranPage()));
     }, onError: (error) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => const WarningDialog(
-          description: "Simpan gagal, silahkan coba lagi",
-        ),
-      );
+      showDialog(context: context, builder: (context) => const WarningDialog(description: "Simpan gagal"));
     });
     setState(() => _isLoading = false);
   }
 
-  void ubah() {
+  ubah() {
     setState(() => _isLoading = true);
-    Pembayaran updatePembayaran = Pembayaran(idPembayaran: null);
-    updatePembayaran.idPembayaran = widget.pembayaran!.idPembayaran;
-    updatePembayaran.idPemeriksaan = int.parse(_idPemeriksaanTextboxController.text);
-    updatePembayaran.totalTagihan = double.tryParse(_totalTagihanTextboxController.text) ?? 0;
-    updatePembayaran.tanggalBayar = _tanggalBayarTextboxController.text;
-    updatePembayaran.statusPembayaran = _statusPembayaranTextboxController.text;
-    PembayaranBloc.updatePembayaran(pembayaran: updatePembayaran).then((value) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const PembayaranPage()),
-      );
+    Pembayaran update = Pembayaran(idPembayaran: widget.pembayaran!.idPembayaran);
+    update.idPemeriksaan = _selectedPemeriksaanId;
+    update.totalTagihan = double.tryParse(_totalTagihanTextboxController.text) ?? 0;
+    update.tanggalBayar = _tanggalBayarTextboxController.text;
+    update.statusPembayaran = _statusPembayaranTextboxController.text;
+    PembayaranBloc.updatePembayaran(pembayaran: update).then((value) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const PembayaranPage()));
     }, onError: (error) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => const WarningDialog(
-          description: "Ubah gagal, silahkan coba lagi",
-        ),
-      );
+      showDialog(context: context, builder: (context) => const WarningDialog(description: "Ubah gagal"));
     });
     setState(() => _isLoading = false);
   }

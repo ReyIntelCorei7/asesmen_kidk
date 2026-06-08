@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:asesmen_kidk_rumah_sakit/bloc/dokter_bloc.dart';
+import 'package:asesmen_kidk_rumah_sakit/bloc/poli_bloc.dart';
 import 'package:asesmen_kidk_rumah_sakit/model/dokter.dart';
+import 'package:asesmen_kidk_rumah_sakit/model/poli.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/dokter_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class DokterForm extends StatefulWidget {
-  final Dokter? dokter;
-  const DokterForm({super.key, this.dokter});
+  Dokter? dokter;
+  DokterForm({Key? key, this.dokter}) : super(key: key);
 
   @override
   _DokterFormState createState() => _DokterFormState();
@@ -20,22 +22,39 @@ class _DokterFormState extends State<DokterForm> {
 
   final _namaDokterTextboxController = TextEditingController();
   final _spesialisasiTextboxController = TextEditingController();
-  final _idPoliTextboxController = TextEditingController();
+  
+  List<Poli> _listPoli = [];
+  int? _selectedPoliId;
 
   @override
   void initState() {
     super.initState();
     isUpdate();
+    _loadPolis();
   }
 
-  void isUpdate() {
+  void _loadPolis() async {
+    try {
+      List poliList = await PoliBloc.getPolis();
+      setState(() {
+        _listPoli = poliList.cast<Poli>();
+        if (widget.dokter != null) {
+          _selectedPoliId = widget.dokter!.idPoli;
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  isUpdate() {
     if (widget.dokter != null) {
       setState(() {
         judul = "UBAH DOKTER";
         tombolSubmit = "UBAH";
         _namaDokterTextboxController.text = widget.dokter!.namaDokter!;
-        _spesialisasiTextboxController.text = widget.dokter!.spesialisasi ?? '';
-        _idPoliTextboxController.text = widget.dokter!.idPoli.toString();
+        _spesialisasiTextboxController.text = widget.dokter!.spesialisasi!;
+        _selectedPoliId = widget.dokter!.idPoli;
       });
     }
   }
@@ -53,7 +72,8 @@ class _DokterFormState extends State<DokterForm> {
               children: [
                 _namaDokterTextField(),
                 _spesialisasiTextField(),
-                _idPoliTextField(),
+                _poliDropdownField(),
+                const SizedBox(height: 20),
                 _buttonSubmit(),
               ],
             ),
@@ -69,9 +89,7 @@ class _DokterFormState extends State<DokterForm> {
       keyboardType: TextInputType.text,
       controller: _namaDokterTextboxController,
       validator: (value) {
-        if (value!.isEmpty) {
-          return "Nama Dokter harus diisi";
-        }
+        if (value!.isEmpty) return "Nama Dokter harus diisi";
         return null;
       },
     );
@@ -85,15 +103,23 @@ class _DokterFormState extends State<DokterForm> {
     );
   }
 
-  Widget _idPoliTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: "ID Poli"),
-      keyboardType: TextInputType.number,
-      controller: _idPoliTextboxController,
+  Widget _poliDropdownField() {
+    return DropdownButtonFormField<int>(
+      decoration: const InputDecoration(labelText: "Poli"),
+      value: _selectedPoliId,
+      items: _listPoli.map((Poli poli) {
+        return DropdownMenuItem<int>(
+          value: poli.idPoli,
+          child: Text(poli.namaPoli ?? ''),
+        );
+      }).toList(),
+      onChanged: (int? newValue) {
+        setState(() {
+          _selectedPoliId = newValue;
+        });
+      },
       validator: (value) {
-        if (value!.isEmpty) {
-          return "ID Poli harus diisi";
-        }
+        if (value == null) return "Pilih Poli";
         return null;
       },
     );
@@ -117,12 +143,12 @@ class _DokterFormState extends State<DokterForm> {
     );
   }
 
-  void simpan() {
+  simpan() {
     setState(() => _isLoading = true);
     Dokter createDokter = Dokter(idDokter: null);
     createDokter.namaDokter = _namaDokterTextboxController.text;
     createDokter.spesialisasi = _spesialisasiTextboxController.text;
-    createDokter.idPoli = int.parse(_idPoliTextboxController.text);
+    createDokter.idPoli = _selectedPoliId;
     DokterBloc.addDokter(dokter: createDokter).then((value) {
       Navigator.pushReplacement(
         context,
@@ -140,13 +166,13 @@ class _DokterFormState extends State<DokterForm> {
     setState(() => _isLoading = false);
   }
 
-  void ubah() {
+  ubah() {
     setState(() => _isLoading = true);
     Dokter updateDokter = Dokter(idDokter: null);
     updateDokter.idDokter = widget.dokter!.idDokter;
     updateDokter.namaDokter = _namaDokterTextboxController.text;
     updateDokter.spesialisasi = _spesialisasiTextboxController.text;
-    updateDokter.idPoli = int.parse(_idPoliTextboxController.text);
+    updateDokter.idPoli = _selectedPoliId;
     DokterBloc.updateDokter(dokter: updateDokter).then((value) {
       Navigator.pushReplacement(
         context,
