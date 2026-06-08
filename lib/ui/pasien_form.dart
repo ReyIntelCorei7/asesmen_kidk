@@ -5,8 +5,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/pasien_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PasienForm extends StatefulWidget {
-  Pasien? pasien;
-  PasienForm({Key? key, this.pasien}) : super(key: key);
+  final Pasien? pasien;
+  const PasienForm({super.key, this.pasien});
 
   @override
   _PasienFormState createState() => _PasienFormState();
@@ -30,7 +30,7 @@ class _PasienFormState extends State<PasienForm> {
     isUpdate();
   }
 
-  isUpdate() {
+  void isUpdate() {
     if (widget.pasien != null) {
       setState(() {
         judul = "UBAH PASIEN";
@@ -147,7 +147,7 @@ class _PasienFormState extends State<PasienForm> {
     );
   }
 
-  simpan() {
+  void simpan() {
     setState(() {
       _isLoading = true;
     });
@@ -176,7 +176,7 @@ class _PasienFormState extends State<PasienForm> {
     });
   }
 
-  ubah() {
+  void ubah() {
     setState(() {
       _isLoading = true;
     });

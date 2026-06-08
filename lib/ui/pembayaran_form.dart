@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:asesmen_kidk_rumah_sakit/bloc/pembayaran_bloc.dart';
 import 'package:asesmen_kidk_rumah_sakit/model/pembayaran.dart';
-import 'package:asesmen_kidk_rumah_sakit/ui/pembayaran_form.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/pembayaran_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PembayaranForm extends StatefulWidget {
-  Pembayaran? pembayaran;
-  PembayaranForm({Key? key, this.pembayaran}) : super(key: key);
+  final Pembayaran? pembayaran;
+  const PembayaranForm({super.key, this.pembayaran});
 
   @override
   _PembayaranFormState createState() => _PembayaranFormState();
@@ -30,7 +29,7 @@ class _PembayaranFormState extends State<PembayaranForm> {
     isUpdate();
   }
 
-  isUpdate() {
+  void isUpdate() {
     if (widget.pembayaran != null) {
       setState(() {
         judul = "UBAH PEMBAYARAN";
@@ -121,7 +120,7 @@ class _PembayaranFormState extends State<PembayaranForm> {
     );
   }
 
-  simpan() {
+  void simpan() {
     setState(() => _isLoading = true);
     Pembayaran createPembayaran = Pembayaran(idPembayaran: null);
     createPembayaran.idPemeriksaan = int.parse(_idPemeriksaanTextboxController.text);
@@ -145,7 +144,7 @@ class _PembayaranFormState extends State<PembayaranForm> {
     setState(() => _isLoading = false);
   }
 
-  ubah() {
+  void ubah() {
     setState(() => _isLoading = true);
     Pembayaran updatePembayaran = Pembayaran(idPembayaran: null);
     updatePembayaran.idPembayaran = widget.pembayaran!.idPembayaran;

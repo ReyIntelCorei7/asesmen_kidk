@@ -6,7 +6,7 @@ import 'package:asesmen_kidk_rumah_sakit/ui/pembayaran_detail.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/pembayaran_form.dart';
 
 class PembayaranPage extends StatefulWidget {
-  const PembayaranPage({Key? key}) : super(key: key);
+  const PembayaranPage({super.key});
 
   @override
   _PembayaranPageState createState() => _PembayaranPageState();
@@ -74,7 +74,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
 class ListPembayaran extends StatelessWidget {
   final List? list;
-  const ListPembayaran({Key? key, this.list}) : super(key: key);
+  const ListPembayaran({super.key, this.list});
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class ListPembayaran extends StatelessWidget {
 
 class ItemPembayaran extends StatelessWidget {
   final Pembayaran pembayaran;
-  const ItemPembayaran({Key? key, required this.pembayaran}) : super(key: key);
+  const ItemPembayaran({super.key, required this.pembayaran});
 
   @override
   Widget build(BuildContext context) {

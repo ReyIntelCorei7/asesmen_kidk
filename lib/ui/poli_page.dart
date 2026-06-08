@@ -6,7 +6,7 @@ import 'package:asesmen_kidk_rumah_sakit/ui/poli_detail.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/poli_form.dart';
 
 class PoliPage extends StatefulWidget {
-  const PoliPage({Key? key}) : super(key: key);
+  const PoliPage({super.key});
 
   @override
   _PoliPageState createState() => _PoliPageState();
@@ -79,7 +79,7 @@ class _PoliPageState extends State<PoliPage> {
 
 class ListPoli extends StatelessWidget {
   final List? list;
-  const ListPoli({Key? key, this.list}) : super(key: key);
+  const ListPoli({super.key, this.list});
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,7 @@ class ListPoli extends StatelessWidget {
 
 class ItemPoli extends StatelessWidget {
   final Poli poli;
-  const ItemPoli({Key? key, required this.poli}) : super(key: key);
+  const ItemPoli({super.key, required this.poli});
 
   @override
   Widget build(BuildContext context) {

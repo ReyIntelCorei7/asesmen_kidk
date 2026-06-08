@@ -5,8 +5,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/pemeriksaan_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PemeriksaanForm extends StatefulWidget {
-  Pemeriksaan? pemeriksaan;
-  PemeriksaanForm({Key? key, this.pemeriksaan}) : super(key: key);
+  final Pemeriksaan? pemeriksaan;
+  const PemeriksaanForm({super.key, this.pemeriksaan});
 
   @override
   _PemeriksaanFormState createState() => _PemeriksaanFormState();
@@ -31,7 +31,7 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
     isUpdate();
   }
 
-  isUpdate() {
+  void isUpdate() {
     if (widget.pemeriksaan != null) {
       setState(() {
         judul = "UBAH PEMERIKSAAN";
@@ -152,7 +152,7 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
     );
   }
 
-  simpan() {
+  void simpan() {
     setState(() => _isLoading = true);
     Pemeriksaan createPemeriksaan = Pemeriksaan(idPemeriksaan: null);
     createPemeriksaan.noRekamMedis = int.parse(_noRekamMedisTextboxController.text);
@@ -178,7 +178,7 @@ class _PemeriksaanFormState extends State<PemeriksaanForm> {
     setState(() => _isLoading = false);
   }
 
-  ubah() {
+  void ubah() {
     setState(() => _isLoading = true);
     Pemeriksaan updatePemeriksaan = Pemeriksaan(idPemeriksaan: null);
     updatePemeriksaan.idPemeriksaan = widget.pemeriksaan!.idPemeriksaan;

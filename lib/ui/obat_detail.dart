@@ -6,8 +6,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/obat_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class ObatDetail extends StatefulWidget {
-  Obat? obat;
-  ObatDetail({Key? key, this.obat}) : super(key: key);
+  final Obat? obat;
+  const ObatDetail({super.key, this.obat});
 
   @override
   _ObatDetailState createState() => _ObatDetailState();

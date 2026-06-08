@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:asesmen_kidk_rumah_sakit/bloc/resep_bloc.dart';
 import 'package:asesmen_kidk_rumah_sakit/model/resep.dart';
-import 'package:asesmen_kidk_rumah_sakit/ui/resep_form.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/resep_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class ResepForm extends StatefulWidget {
-  Resep? resep;
-  ResepForm({Key? key, this.resep}) : super(key: key);
+  final Resep? resep;
+  const ResepForm({super.key, this.resep});
 
   @override
   _ResepFormState createState() => _ResepFormState();
@@ -31,7 +30,7 @@ class _ResepFormState extends State<ResepForm> {
     isUpdate();
   }
 
-  isUpdate() {
+  void isUpdate() {
     if (widget.resep != null) {
       setState(() {
         judul = "UBAH RESEP";
@@ -144,7 +143,7 @@ class _ResepFormState extends State<ResepForm> {
     );
   }
 
-  simpan() {
+  void simpan() {
     setState(() => _isLoading = true);
     Resep createResep = Resep(idResep: null);
     createResep.idPemeriksaan = int.parse(_idPemeriksaanTextboxController.text);
@@ -169,7 +168,7 @@ class _ResepFormState extends State<ResepForm> {
     setState(() => _isLoading = false);
   }
 
-  ubah() {
+  void ubah() {
     setState(() => _isLoading = true);
     Resep updateResep = Resep(idResep: null);
     updateResep.idResep = widget.resep!.idResep;

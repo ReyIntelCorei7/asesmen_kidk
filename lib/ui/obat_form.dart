@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:asesmen_kidk_rumah_sakit/bloc/obat_bloc.dart';
 import 'package:asesmen_kidk_rumah_sakit/model/obat.dart';
-import 'package:asesmen_kidk_rumah_sakit/ui/obat_form.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/obat_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class ObatForm extends StatefulWidget {
-  Obat? obat;
-  ObatForm({Key? key, this.obat}) : super(key: key);
+  final Obat? obat;
+  const ObatForm({super.key, this.obat});
 
   @override
   _ObatFormState createState() => _ObatFormState();
@@ -29,7 +28,7 @@ class _ObatFormState extends State<ObatForm> {
     isUpdate();
   }
 
-  isUpdate() {
+  void isUpdate() {
     if (widget.obat != null) {
       setState(() {
         judul = "UBAH OBAT";
@@ -110,7 +109,7 @@ class _ObatFormState extends State<ObatForm> {
     );
   }
 
-  simpan() {
+  void simpan() {
     setState(() => _isLoading = true);
     Obat createObat = Obat(idObat: null);
     createObat.namaObat = _namaObatTextboxController.text;
@@ -133,7 +132,7 @@ class _ObatFormState extends State<ObatForm> {
     setState(() => _isLoading = false);
   }
 
-  ubah() {
+  void ubah() {
     setState(() => _isLoading = true);
     Obat updateObat = Obat(idObat: null);
     updateObat.idObat = widget.obat!.idObat;

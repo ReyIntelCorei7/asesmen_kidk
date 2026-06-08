@@ -5,8 +5,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/dokter_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class DokterForm extends StatefulWidget {
-  Dokter? dokter;
-  DokterForm({Key? key, this.dokter}) : super(key: key);
+  final Dokter? dokter;
+  const DokterForm({super.key, this.dokter});
 
   @override
   _DokterFormState createState() => _DokterFormState();
@@ -28,7 +28,7 @@ class _DokterFormState extends State<DokterForm> {
     isUpdate();
   }
 
-  isUpdate() {
+  void isUpdate() {
     if (widget.dokter != null) {
       setState(() {
         judul = "UBAH DOKTER";
@@ -117,7 +117,7 @@ class _DokterFormState extends State<DokterForm> {
     );
   }
 
-  simpan() {
+  void simpan() {
     setState(() => _isLoading = true);
     Dokter createDokter = Dokter(idDokter: null);
     createDokter.namaDokter = _namaDokterTextboxController.text;
@@ -140,7 +140,7 @@ class _DokterFormState extends State<DokterForm> {
     setState(() => _isLoading = false);
   }
 
-  ubah() {
+  void ubah() {
     setState(() => _isLoading = true);
     Dokter updateDokter = Dokter(idDokter: null);
     updateDokter.idDokter = widget.dokter!.idDokter;

@@ -4,7 +4,7 @@ class WarningDialog extends StatelessWidget {
   final String? description;
   final VoidCallback? okClick;
 
-  const WarningDialog({Key? key, this.description, this.okClick}) : super(key: key);
+  const WarningDialog({super.key, this.description, this.okClick});
 
   @override
   Widget build(BuildContext context) {

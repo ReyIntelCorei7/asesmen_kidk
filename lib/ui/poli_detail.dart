@@ -6,8 +6,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/poli_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PoliDetail extends StatefulWidget {
-  Poli? poli;
-  PoliDetail({Key? key, this.poli}) : super(key: key);
+  final Poli? poli;
+  const PoliDetail({super.key, this.poli});
 
   @override
   _PoliDetailState createState() => _PoliDetailState();

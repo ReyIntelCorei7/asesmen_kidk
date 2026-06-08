@@ -6,8 +6,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/pemeriksaan_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PemeriksaanDetail extends StatefulWidget {
-  Pemeriksaan? pemeriksaan;
-  PemeriksaanDetail({Key? key, this.pemeriksaan}) : super(key: key);
+  final Pemeriksaan? pemeriksaan;
+  const PemeriksaanDetail({super.key, this.pemeriksaan});
 
   @override
   _PemeriksaanDetailState createState() => _PemeriksaanDetailState();

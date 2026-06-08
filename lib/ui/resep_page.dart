@@ -6,7 +6,7 @@ import 'package:asesmen_kidk_rumah_sakit/ui/resep_detail.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/resep_form.dart';
 
 class ResepPage extends StatefulWidget {
-  const ResepPage({Key? key}) : super(key: key);
+  const ResepPage({super.key});
 
   @override
   _ResepPageState createState() => _ResepPageState();
@@ -74,7 +74,7 @@ class _ResepPageState extends State<ResepPage> {
 
 class ListResep extends StatelessWidget {
   final List? list;
-  const ListResep({Key? key, this.list}) : super(key: key);
+  const ListResep({super.key, this.list});
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class ListResep extends StatelessWidget {
 
 class ItemResep extends StatelessWidget {
   final Resep resep;
-  const ItemResep({Key? key, required this.resep}) : super(key: key);
+  const ItemResep({super.key, required this.resep});
 
   @override
   Widget build(BuildContext context) {

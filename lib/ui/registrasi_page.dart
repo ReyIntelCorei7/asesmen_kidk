@@ -3,7 +3,7 @@ import 'package:asesmen_kidk_rumah_sakit/bloc/registrasi_bloc.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class RegistrasiPage extends StatefulWidget {
-  const RegistrasiPage({Key? key}) : super(key: key);
+  const RegistrasiPage({super.key});
 
   @override
   _RegistrasiPageState createState() => _RegistrasiPageState();

@@ -6,8 +6,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/pembayaran_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PembayaranDetail extends StatefulWidget {
-  Pembayaran? pembayaran;
-  PembayaranDetail({Key? key, this.pembayaran}) : super(key: key);
+  final Pembayaran? pembayaran;
+  const PembayaranDetail({super.key, this.pembayaran});
 
   @override
   _PembayaranDetailState createState() => _PembayaranDetailState();

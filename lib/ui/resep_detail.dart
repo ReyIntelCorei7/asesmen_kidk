@@ -6,8 +6,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/resep_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class ResepDetail extends StatefulWidget {
-  Resep? resep;
-  ResepDetail({Key? key, this.resep}) : super(key: key);
+  final Resep? resep;
+  const ResepDetail({super.key, this.resep});
 
   @override
   _ResepDetailState createState() => _ResepDetailState();

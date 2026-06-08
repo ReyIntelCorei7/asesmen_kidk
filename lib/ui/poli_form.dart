@@ -5,8 +5,8 @@ import 'package:asesmen_kidk_rumah_sakit/ui/poli_page.dart';
 import 'package:asesmen_kidk_rumah_sakit/widget/warning_dialog.dart';
 
 class PoliForm extends StatefulWidget {
-  Poli? poli;
-  PoliForm({Key? key, this.poli}) : super(key: key);
+  final Poli? poli;
+  const PoliForm({super.key, this.poli});
 
   @override
   _PoliFormState createState() => _PoliFormState();
@@ -27,7 +27,7 @@ class _PoliFormState extends State<PoliForm> {
     isUpdate();
   }
 
-  isUpdate() {
+  void isUpdate() {
     if (widget.poli != null) {
       setState(() {
         judul = "UBAH POLI";
@@ -100,7 +100,7 @@ class _PoliFormState extends State<PoliForm> {
     );
   }
 
-  simpan() {
+  void simpan() {
     setState(() => _isLoading = true);
     Poli createPoli = Poli(idPoli: null);
     createPoli.namaPoli = _namaPoliTextboxController.text;
@@ -122,7 +122,7 @@ class _PoliFormState extends State<PoliForm> {
     setState(() => _isLoading = false);
   }
 
-  ubah() {
+  void ubah() {
     setState(() => _isLoading = true);
     Poli updatePoli = Poli(idPoli: null);
     updatePoli.idPoli = widget.poli!.idPoli;

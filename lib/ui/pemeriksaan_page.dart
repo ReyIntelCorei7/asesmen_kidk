@@ -6,7 +6,7 @@ import 'package:asesmen_kidk_rumah_sakit/ui/pemeriksaan_detail.dart';
 import 'package:asesmen_kidk_rumah_sakit/ui/pemeriksaan_form.dart';
 
 class PemeriksaanPage extends StatefulWidget {
-  const PemeriksaanPage({Key? key}) : super(key: key);
+  const PemeriksaanPage({super.key});
 
   @override
   _PemeriksaanPageState createState() => _PemeriksaanPageState();
@@ -74,7 +74,7 @@ class _PemeriksaanPageState extends State<PemeriksaanPage> {
 
 class ListPemeriksaan extends StatelessWidget {
   final List? list;
-  const ListPemeriksaan({Key? key, this.list}) : super(key: key);
+  const ListPemeriksaan({super.key, this.list});
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class ListPemeriksaan extends StatelessWidget {
 
 class ItemPemeriksaan extends StatelessWidget {
   final Pemeriksaan pemeriksaan;
-  const ItemPemeriksaan({Key? key, required this.pemeriksaan}) : super(key: key);
+  const ItemPemeriksaan({super.key, required this.pemeriksaan});
 
   @override
   Widget build(BuildContext context) {
